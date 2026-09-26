@@ -1,0 +1,594 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f1e8;
+    color: #2d2d2d;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 25px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+h1 {
+    font-size: 52px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.tagline {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 35px;
+}
+
+
+/* =========================
+   STREAK
+========================= */
+
+.streak-card {
+    background: #2d2d2d;
+    color: white;
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.streak-card h2 {
+    font-size: 30px;
+    margin: 0 0 8px;
+}
+
+.streak-card p {
+    margin: 0;
+    color: #ddd;
+}
+
+
+/* =========================
+   QUICK STATS
+========================= */
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+}
+
+.stat-card h3 {
+    font-size: 28px;
+    margin: 0 0 5px;
+}
+
+.stat-card p {
+    margin: 5px 0;
+    color: #777;
+}
+
+.stat-card strong {
+    display: block;
+    font-size: 30px;
+    margin-top: 8px;
+}
+
+
+/* =========================
+   GENERAL CARD
+========================= */
+
+.card {
+    background: white;
+    padding: 30px;
+    margin-top: 25px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+
+/* =========================
+   BOOKSHELF
+========================= */
+
+.bookshelf {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+
+/* =========================
+   BOOK CARD
+========================= */
+
+.book-card {
+    background: #faf8f2;
+    border-radius: 18px;
+    padding: 22px;
+    text-align: center;
+    border: 1px solid #e8e2d5;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+/* =========================
+   COMPLETED BOOK
+========================= */
+
+.completed-book {
+    border: 2px solid #d8d0c0;
+}
+
+.completed-book:hover {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================
+   BOOK COVER
+========================= */
+
+.book-cover {
+    width: 120px;
+    height: 155px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 8px;
+
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px;
+
+    box-sizing: border-box;
+
+    box-shadow: 4px 5px 10px rgba(0, 0, 0, 0.15);
+
+    position: relative;
+}
+
+.reading-cover {
+    background: #3f3f3f;
+}
+
+.completed-cover {
+    background: #222;
+}
+
+.cover-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.cover-title {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    max-width: 100%;
+
+    overflow: hidden;
+}
+
+.cover-label {
+    position: absolute;
+
+    bottom: 8px;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+    font-weight: bold;
+
+    opacity: 0.85;
+}
+
+
+/* =========================
+   BOOK INFORMATION
+========================= */
+
+.book-card h3 {
+    margin: 8px 0 5px;
+    font-size: 20px;
+}
+
+.author {
+    color: #777;
+    margin-top: 0;
+}
+
+.pages {
+    font-size: 14px;
+    color: #666;
+    margin-top: 18px;
+}
+
+.percentage {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-container {
+    width: 100%;
+    height: 12px;
+
+    background: #e5e5e5;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    margin: 12px 0 18px;
+}
+
+.progress-bar {
+    height: 100%;
+
+    background: #2d2d2d;
+
+    border-radius: 20px;
+}
+
+.completed-progress {
+    background: #555;
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+.completed {
+    color: #2d2d2d;
+}
+
+.reading {
+    color: #666;
+}
+
+
+/* =========================
+   ADD BOOK
+========================= */
+
+.add-book-card {
+    background: white;
+
+    border: 2px dashed #bbb;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    min-height: 250px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.add-book-card:hover {
+    background: #fafafa;
+    transform: translateY(-5px);
+}
+
+.add-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.add-book-card h3 {
+    margin: 5px;
+    font-size: 20px;
+}
+
+.add-book-card p {
+    color: #777;
+}
+
+
+/* =========================
+   FORMS
+========================= */
+
+form {
+    margin-top: 15px;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px;
+    margin-top: 10px;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+
+    font-size: 15px;
+}
+
+button {
+    border: none;
+
+    padding: 12px 25px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    background: #2d2d2d;
+    color: white;
+
+    margin-top: 12px;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+
+/* =========================
+   EMPTY SHELF
+========================= */
+
+.empty-shelf {
+    grid-column: 1 / -1;
+
+    padding: 40px;
+
+    text-align: center;
+
+    color: #777;
+}
+
+
+/* =========================
+   READING JOURNEY
+========================= */
+
+.journey-stats {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 15px;
+}
+
+.journey-stats div {
+    background: #faf8f2;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    text-align: center;
+}
+
+.journey-stats span {
+    font-size: 25px;
+}
+
+.journey-stats p {
+    color: #777;
+
+    margin: 8px 0;
+
+    font-size: 14px;
+}
+
+.journey-stats strong {
+    font-size: 22px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
+
+    .container {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 40px;
+    }
+
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf {
+        grid-template-columns: 1fr;
+    }
+
+    .journey-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+/* =========================
+   READING GOAL
+========================= */
+
+.goal-card {
+    margin-bottom: 30px;
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.goal-header strong {
+    display: block;
+    font-size: 28px;
+}
+
+.goal-header span {
+    color: #777;
+    font-size: 14px;
+}
+
+.goal-percentage {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.goal-progress-container {
+    width: 100%;
+    height: 16px;
+
+    background: #e5e5e5;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+.goal-progress-bar {
+    height: 100%;
+
+    background: #2d2d2d;
+
+    border-radius: 20px;
+
+    transition: width 0.5s ease;
+}
+
+.goal-message {
+    color: #666;
+    margin-top: 15px;
+    font-size: 15px;
+}
+
+.goal-complete {
+    font-weight: bold;
+}
+
+/* =========================
+   EDIT & DELETE BUTTONS
+========================= */
+
+.edit-button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.edit-form {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.delete-button {
+    width: 100%;
+    background: #555;
+}
+
+/* =========================
+   COMPLETION BADGE
+========================= */
+
+.completion-badge {
+    display: inline-block;
+
+    margin: 12px 0;
+
+    padding: 8px 14px;
+
+    border-radius: 20px;
+
+    background: #2d2d2d;
+
+    color: white;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+/* =========================
+   PROGRESS HINT
+========================= */
+
+.progress-hint {
+    color: #888;
+    font-size: 12px;
+    margin: 6px 0 0;
+}
+
+/* =========================
+   UPDATE BUTTON
+========================= */
+
+.book-card form button {
+    width: 100%;
+}

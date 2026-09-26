@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BookStreak</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <h1>📚 BookStreak</h1>
+
+    <p class="tagline">
+        Track your reading. Build your streak. Become a reader.
+    </p>
+
+
+    <!-- =========================
+         STREAK
+    ========================= -->
+
+    <div class="streak-card">
+
+        <h2>
+            🔥 {{ streak }} Day Streak
+        </h2>
+
+        <p>
+            Keep the pages turning!
+        </p>
+
+    </div>
+
+
+    <!-- =========================
+         QUICK STATS
+    ========================= -->
+
+    <div class="stats-container">
+
+        <div class="stat-card">
+
+            <h3>📚</h3>
+
+            <p>Books</p>
+
+            <strong>
+                {{ books|length }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>📄</h3>
+
+            <p>Pages</p>
+
+            <strong>
+                {{ total_pages_read }}
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>🎉</h3>
+
+            <p>Completed</p>
+
+            <strong>
+                {{ completed_books }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         READING SHELF
+    ========================= -->
+
+    <div class="card">
+
+        <h2>
+            📖 My Reading Shelf
+        </h2>
+
+
+        <div class="bookshelf">
+
+
+            {% if books %}
+
+
+                {% for book in books %}
+
+
+                    <!-- BOOK CARD -->
+
+                    <div
+                        class="book-card
+                        {% if book.completed %}
+                            completed-book
+                        {% endif %}"
+                    >
+
+
+                        <!-- BOOK COVER -->
+
+                        <div
+                            class="book-cover
+                            {% if book.completed %}
+                                completed-cover
+                            {% else %}
+                                reading-cover
+                            {% endif %}"
+                        >
+
+                            <div class="cover-icon">
+
+                                {% if book.completed %}
+
+                                    📕
+                                    
+                                {% else %}
+
+                                    📘
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="cover-title">
+
+                                {{ book.title }}
+
+                            </div>
+
+
+                            {% if book.completed %}
+
+                                <div class="cover-label">
+
+                                    COMPLETED
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- BOOK INFORMATION -->
+
+                        <h3>
+                            {{ book.title }}
+                        </h3>
+
+
+                        <p class="author">
+                            {{ book.author }}
+                        </p>
+
+
+                        <p class="pages">
+
+                            {{ book.pages_read }}
+                            /
+                            {{ book.total_pages }}
+                            pages
+
+                        </p>
+
+
+                        <p class="percentage">
+
+                            {{ book.progress }}%
+
+                        </p>
+
+
+                        <!-- PROGRESS BAR -->
+
+                        <div class="progress-container">
+
+                            <div
+                                class="progress-bar
+                                {% if book.completed %}
+                                    completed-progress
+                                {% endif %}"
+                                data-progress="{{ book.progress }}"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        {% if book.completed %}
+
+
+                            <div class="completion-badge">
+
+                                🎉 BOOK COMPLETED
+
+                            </div>
+
+
+                        {% else %}
+
+
+                            <p class="status reading">
+
+                                📖 Reading
+
+                            </p>
+
+
+                            <!-- UPDATE PROGRESS -->
+
+                            <form
+                                action="/update/{{ book.id }}"
+                                method="POST"
+                            >
+
+                                <input
+                                    type="number"
+                                    name="pages_read"
+                                    placeholder="Total pages read"
+                                    min="0"
+                                    max="{{ book.total_pages }}"
+                                    required
+                                >
+
+
+                                <p class="progress-hint">
+
+                                    Currently at
+                                    {{ book.pages_read }}
+                                    pages
+                                    •
+                                    Maximum
+                                    {{ book.total_pages }}
+                                    pages
+
+                                </p>
+
+
+                                <button type="submit">
+
+                                    Update
+
+                                </button>
+
+                            </form>
+
+
+                        {% endif %}
+
+
+                        <!-- EDIT BUTTON -->
+
+                        <button
+                            type="button"
+                            class="edit-button"
+                            onclick="showEditForm('{{ book.id }}')"
+                        >
+
+                            ✏️ Edit Book
+
+                        </button>
+
+
+                        <!-- EDIT FORM -->
+
+                        <div
+                            id="edit-form-{{ book.id }}"
+                            class="edit-form"
+                            style="display: none;"
+                        >
+
+                            <form
+                                action="/edit/{{ book.id }}"
+                                method="POST"
+                            >
+
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value="{{ book.title }}"
+                                    placeholder="Book title"
+                                    required
+                                >
+
+
+                                <input
+                                    type="text"
+                                    name="author"
+                                    value="{{ book.author }}"
+                                    placeholder="Author"
+                                    required
+                                >
+
+
+                                <input
+                                    type="number"
+                                    name="total_pages"
+                                    value="{{ book.total_pages }}"
+                                    min="{{ book.pages_read }}"
+                                    required
+                                >
+
+
+                                <button type="submit">
+
+                                    Save Changes
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <!-- REMOVE BOOK -->
+
+                        <form
+                            action="/delete/{{ book.id }}"
+                            method="POST"
+                            onsubmit="return confirmDelete('{{ book.title }}');"
+                        >
+
+                            <button
+                                type="submit"
+                                class="delete-button"
+                            >
+
+                                🗑️ Remove Book
+
+                            </button>
+
+                        </form>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <!-- EMPTY SHELF -->
+
+                <div class="empty-shelf">
+
+                    <h3>
+
+                        📚 Your shelf is empty
+
+                    </h3>
+
+                    <p>
+
+                        Add your first book and start your reading journey.
+
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+
+            <!-- =========================
+                 ADD BOOK CARD
+            ========================= -->
+
+            <div
+                class="add-book-card"
+                onclick="showAddBookForm()"
+            >
+
+                <div class="add-icon">
+
+                    ＋
+
+                </div>
+
+
+                <h3>
+
+                    Add Book
+
+                </h3>
+
+
+                <p>
+
+                    Start a new reading journey
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         ADD BOOK FORM
+    ========================= -->
+
+    <div
+        class="card"
+        id="add-book-form"
+        style="display: none;"
+    >
+
+        <h2>
+
+            ➕ Add a New Book
+
+        </h2>
+
+
+        <form
+            action="/add"
+            method="POST"
+        >
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Book title"
+                required
+            >
+
+
+            <input
+                type="text"
+                name="author"
+                placeholder="Author"
+                required
+            >
+
+
+            <input
+                type="number"
+                name="total_pages"
+                placeholder="Total pages"
+                min="1"
+                required
+            >
+
+
+            <button type="submit">
+
+                Add Book
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================
+         READING JOURNEY
+    ========================= -->
+
+    <div class="card journey-card">
+
+        <h2>
+
+            📊 Reading Journey
+
+        </h2>
+
+
+        <div class="journey-stats">
+
+
+            <div>
+
+                <span>📚</span>
+
+                <p>
+                    Total Books
+                </p>
+
+                <strong>
+                    {{ books|length }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>🎉</span>
+
+                <p>
+                    Completed
+                </p>
+
+                <strong>
+                    {{ completed_books }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>📄</span>
+
+                <p>
+                    Pages Read
+                </p>
+
+                <strong>
+                    {{ total_pages_read }}
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>🔥</span>
+
+                <p>
+                    Current Streak
+                </p>
+
+                <strong>
+                    {{ streak }} day
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         READING GOAL
+    ========================= -->
+
+    <div class="card goal-card">
+
+        <h2>
+
+            🎯 Reading Goal
+
+        </h2>
+
+
+        <div class="goal-header">
+
+
+            <div>
+
+                <strong>
+
+                    {{ completed_books }}
+                    /
+                    {{ reading_goal }}
+
+                </strong>
+
+
+                <span>
+
+                    books completed
+
+                </span>
+
+            </div>
+
+
+            <div class="goal-percentage">
+
+                {{ goal_progress }}%
+
+            </div>
+
+
+        </div>
+
+
+        <div class="goal-progress-container">
+
+            <div
+                class="goal-progress-bar"
+                data-progress="{{ goal_progress }}"
+            ></div>
+
+        </div>
+
+
+        {% if books_remaining > 0 %}
+
+
+            <p class="goal-message">
+
+                📚 {{ books_remaining }} books to go!
+
+            </p>
+
+
+        {% else %}
+
+
+            <p class="goal-message goal-complete">
+
+                🎉 Reading goal completed!
+
+            </p>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- =========================
+         DAILY READING GOAL
+    ========================= -->
+
+    <div class="card daily-goal-card">
+
+        <h2>
+
+            📖 Today's Reading Goal
+
+        </h2>
+
+
+        <div class="goal-header">
+
+
+            <div>
+
+                <strong>
+
+                    {{ pages_today }}
+                    /
+                    {{ daily_goal }}
+
+                </strong>
+
+
+                <span>
+
+                    pages read today
+
+                </span>
+
+            </div>
+
+
+            <div class="goal-percentage">
+
+                {{ daily_goal_progress }}%
+
+            </div>
+
+
+        </div>
+
+
+        <div class="goal-progress-container">
+
+            <div
+                class="goal-progress-bar"
+                data-progress="{{ daily_goal_progress }}"
+            ></div>
+
+        </div>
+
+
+        {% if daily_goal_progress >= 100 %}
+
+
+            <p class="goal-message goal-complete">
+
+                🎉 Daily reading goal completed!
+
+            </p>
+
+
+        {% else %}
+
+
+            <p class="goal-message">
+
+                📚 Keep reading!
+                Your goal is
+                {{ daily_goal }}
+                pages today.
+
+            </p>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+
+<script>
+
+
+    // =========================
+    // BOOK PROGRESS BARS
+    // =========================
+
+    document
+        .querySelectorAll(".progress-bar")
+        .forEach(function(bar) {
+
+            bar.style.width =
+                bar.dataset.progress + "%";
+
+        });
+
+
+    // =========================
+    // GOAL PROGRESS BARS
+    // =========================
+
+    document
+        .querySelectorAll(".goal-progress-bar")
+        .forEach(function(bar) {
+
+            bar.style.width =
+                bar.dataset.progress + "%";
+
+        });
+
+
+    // =========================
+    // ADD BOOK FORM
+    // =========================
+
+    function showAddBookForm() {
+
+        const form =
+            document.getElementById("add-book-form");
+
+
+        form.style.display = "block";
+
+
+        form.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+
+
+    // =========================
+    // EDIT BOOK FORM
+    // =========================
+
+    function showEditForm(bookId) {
+
+        const form =
+            document.getElementById(
+                "edit-form-" + bookId
+            );
+
+
+        if (form.style.display === "none") {
+
+            form.style.display = "block";
+
+
+            form.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+
+        else {
+
+            form.style.display = "none";
+
+        }
+
+    }
+
+
+    // =========================
+    // DELETE CONFIRMATION
+    // =========================
+
+    function confirmDelete(bookTitle) {
+
+        return confirm(
+            "Are you sure you want to remove \"" +
+            bookTitle +
+            "\" from your shelf?"
+        );
+
+    }
+
+
+</script>
+
+<footer class="footer">
+
+    <p>
+        BookStreak • Commit:
+        {{ render_git_commit }}
+    </p>
+
+</footer>
+
+</body>
+
+</html>
