@@ -232,7 +232,7 @@ def home():
     # DAILY READING GOAL
     # =========================
 
-    daily_goal = 20
+    daily_goal = 100
 
     pages_today = 0
 
