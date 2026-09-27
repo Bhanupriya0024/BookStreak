@@ -58,10 +58,4 @@ jobs:
 
     steps:
       - name: Trigger Render deploy
-      run: |
-        if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
-          echo "SECRET IS EMPTY"
-          exit 1
-        else
-          echo "SECRET IS AVAILABLE"
-        fi
+      run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}&ref=${{ github.sha }}"
