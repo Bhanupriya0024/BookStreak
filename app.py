@@ -62,6 +62,24 @@ def create_database():
             "ALTER TABLE books ADD COLUMN pages_today INTEGER DEFAULT 0"
         )
 
+    # Create a small table to remember the current streak.
+    # This stores only the latest activity date and current streak,
+    # not a day-by-day reading history.
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS app_state (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            last_activity TEXT,
+            current_streak INTEGER DEFAULT 0
+        )
+    """)
+
+    connection.execute("""
+        INSERT OR IGNORE INTO app_state
+        (id, last_activity, current_streak)
+        VALUES (1, NULL, 0)
+    """)
+
     connection.commit()
 
     connection.close()
@@ -100,69 +118,51 @@ def home():
         """
         SELECT COUNT(*)
         FROM books
-        WHERE pages_read = total_pages
+        WHERE pages_read >= total_pages
         """
     ).fetchone()[0]
 
     # =========================
-    # READING DATES
+    # CURRENT STREAK
     # =========================
 
-    reading_dates = connection.execute(
+    state = connection.execute(
         """
-        SELECT DISTINCT last_read
-        FROM books
-        WHERE last_read IS NOT NULL
+        SELECT *
+        FROM app_state
+        WHERE id = 1
         """
-    ).fetchall()
-
-    connection.close()
-
-    # =========================
-    # CALCULATE STREAK
-    # =========================
-
-    dates = []
-
-    for row in reading_dates:
-
-        dates.append(
-            date.fromisoformat(row["last_read"])
-        )
-
-    dates = sorted(
-        set(dates),
-        reverse=True
-    )
-
-    streak = 0
+    ).fetchone()
 
     today = date.today()
 
-    if dates:
+    streak = 0
 
-        if dates[0] == today:
+    if state and state["last_activity"]:
 
-            streak = 1
+        last_activity = date.fromisoformat(
+            state["last_activity"]
+        )
 
-            current_date = today
+        # Streak remains active if the user has read today
+        # or read yesterday.
 
-            for reading_date in dates[1:]:
+        if last_activity == today:
 
-                expected_date = (
-                    current_date
-                    - timedelta(days=1)
-                )
+            streak = state["current_streak"]
 
-                if reading_date == expected_date:
+        elif last_activity == today - timedelta(days=1):
 
-                    streak += 1
+            # Yesterday was the last activity.
+            # Keep the streak ready for today's activity.
 
-                    current_date = reading_date
+            streak = state["current_streak"]
 
-                else:
+        else:
 
-                    break
+            # A day was missed.
+
+            streak = 0
 
     # =========================
     # CONVERT BOOKS
@@ -192,7 +192,7 @@ def home():
 
             book["progress"] = 0
 
-        if book["pages_read"] == book["total_pages"]:
+        if book["pages_read"] >= book["total_pages"]:
 
             book["completed"] = True
 
@@ -236,7 +236,7 @@ def home():
 
     pages_today = 0
 
-    today_string = date.today().isoformat()
+    today_string = today.isoformat()
 
     for book in books:
 
@@ -288,7 +288,10 @@ def home():
 
         daily_goal_progress=daily_goal_progress,
 
-        render_git_commit=os.getenv("RENDER_GIT_COMMIT", "local")
+        render_git_commit=os.getenv(
+            "RENDER_GIT_COMMIT",
+            "local"
+        )
     )
 
 
@@ -363,11 +366,18 @@ def update_progress(book_id):
 
     if book and 0 <= pages_read <= book["total_pages"]:
 
-        today = date.today().isoformat()
+        today = date.today()
 
-        # Calculate pages newly read today
+        today_string = today.isoformat()
 
-        if book["last_read"] == today:
+        # =========================
+        # CALCULATE TODAY'S PAGES
+        # =========================
+
+        if book["last_read"] == today_string:
+
+            # Same day:
+            # only add the newly read pages.
 
             pages_today = book["pages_today"] + max(
                 pages_read - book["pages_read"],
@@ -376,7 +386,54 @@ def update_progress(book_id):
 
         else:
 
-            pages_today = 0
+            # First reading activity for this book today.
+            # The new pages are today's reading.
+
+            pages_today = max(
+                pages_read - book["pages_read"],
+                0
+            )
+
+        # =========================
+        # UPDATE STREAK
+        # =========================
+
+        state = connection.execute(
+            """
+            SELECT *
+            FROM app_state
+            WHERE id = 1
+            """
+        ).fetchone()
+
+        last_activity = None
+
+        if state and state["last_activity"]:
+
+            last_activity = date.fromisoformat(
+                state["last_activity"]
+            )
+
+        current_streak = 0
+
+        if last_activity == today:
+
+            # Already recorded reading activity today.
+            current_streak = state["current_streak"]
+
+        elif last_activity == today - timedelta(days=1):
+
+            # Read yesterday and today.
+            current_streak = state["current_streak"] + 1
+
+        else:
+
+            # First reading day or a missed day.
+            current_streak = 1
+
+        # =========================
+        # SAVE BOOK PROGRESS
+        # =========================
 
         connection.execute(
             """
@@ -391,9 +448,29 @@ def update_progress(book_id):
 
             (
                 pages_read,
-                today,
+                today_string,
                 pages_today,
                 book_id
+            )
+        )
+
+        # =========================
+        # SAVE CURRENT STREAK
+        # =========================
+
+        connection.execute(
+            """
+            UPDATE app_state
+
+            SET last_activity = ?,
+                current_streak = ?
+
+            WHERE id = 1
+            """,
+
+            (
+                today_string,
+                current_streak
             )
         )
 
@@ -493,6 +570,7 @@ def delete_book(book_id):
 
     return redirect("/")
 
+
 # =========================
 # JSON API
 # =========================
@@ -513,7 +591,8 @@ def api_books():
         "books": [dict(book) for book in books]
     }
 
-    # =========================
+
+# =========================
 # HEALTH CHECK
 # =========================
 
@@ -525,6 +604,7 @@ def health():
         "status": "ok"
     }
 
+
 # =========================
 # RUN APPLICATION
 # =========================
@@ -534,4 +614,5 @@ create_database()
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
