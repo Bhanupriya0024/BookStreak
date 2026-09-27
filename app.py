@@ -529,9 +529,7 @@ def health():
 # RUN APPLICATION
 # =========================
 
+create_database()
 
 if __name__ == "__main__":
-
-    create_database()
-
     app.run(debug=True)
