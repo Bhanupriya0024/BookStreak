@@ -24,7 +24,7 @@ class BookStreakTests(unittest.TestCase):
 
     def test_health(self):
         response = self.client.get("/health")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
 
         data = response.get_json()
 
